@@ -45,13 +45,17 @@ function generateFrameOverlay(width, height, rarity, frame) {
   const normalizedFrame = frame / 20;
   
   switch(rarity) {
-    case 'scanlines':
-      const scanY = (frame * height / 10) % height;
+    case 'scanlines': {
+      const lineGap = 4;
+      const lines = [];
+      for (let y = 0; y < height; y += lineGap) {
+        lines.push(`<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#00ff00" stroke-width="2" opacity="0.3"/>`);
+      }
       return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="rgba(0,0,0,0.7)"/>
-        <line x1="0" y1="${scanY}" x2="${width}" y2="${scanY}" 
-              stroke="#00ff00" stroke-width="3" opacity="0.9"/>
+        ${lines.join('')}
       </svg>`;
+    }
 
     case 'glow-pulse':
       const opacity = 0.4 + 0.5 * Math.sin(frame * 0.5);
@@ -85,7 +89,7 @@ function generateFrameOverlay(width, height, rarity, frame) {
 // Handle command-line arguments
 if (process.argv.length < 3) {
   console.log(`
-Usage: node gifmaker.js <input-image> [effect-type] [output-file]
+Usage: bun phosphorizer.js <input-image> [effect-type] [output-file]
 
 Available effects:
 - scanlines (default)
@@ -93,7 +97,7 @@ Available effects:
 - rgb-shift
 
 Example:
-  node gifmaker.js myimage.png glow-pulse output.gif
+  bun phosphorizer.js myimage.png glow-pulse output.gif
 `);
   process.exit(0);
 }
